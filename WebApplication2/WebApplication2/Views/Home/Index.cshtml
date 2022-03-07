@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+@model List<Employee>
+@{
+   
+    ViewData["Title"] = "Home Page";
+}
+
+
+<html>
+<body>
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        @Html.HiddenFor(model => Model[i])
+    }
+    
+    @foreach (var item in Model)
+    {
+        <div class="row">
+            <div class="col-md-2">
+                @item.Name
+            </div>
+            <div class="col-md-2">
+                <input id=T+@item.EmployeeId name=T+@item.EmployeeId type="text" readonly="readonly" value="@item.employeeType" />
+                
+            </div>
+            <div class="col-md-2">
+                <input id=@item.EmployeeId  name="@item.EmployeeId" type="number" min="0" max="260" value="@item.WorkDays"/>
+            </div>
+            <div class="col-md-2">
+                <input id=V+@item.EmployeeId name=V+@item.EmployeeId type="number" min="0" max="30" value="@item.VacationDays" />
+            </div>
+            <div class="col-md-2">
+                <button type="button" onclick="GetVacationDays('@item.EmployeeId')">Work</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" onclick="TakeVacation('@item.EmployeeId')">Take Vacation</button>
+            </div>
+        </div>
+
+    }
+
+
+
+
+<script type="text/javascript">
+    function GetVacationDays(id) {
+        var daysWorked = document.getElementById(id).value;
+        if (daysWorked < 0 || daysWorked > 260) {
+            alert("Work days out of range");
+        } else {
+            $.ajax({
+
+                url: "Home/Work",
+                // data: JSON.stringify(obj),
+                data: { "employeeId": id, "workDays": daysWorked },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function () {
+                    location.reload();
+                }
+            });
+        }
+   
+    }
+
+    function TakeVacation(id) {
+        var name = 'V+' + id;
+        var typeName = 'T+' + id;
+        var vacationDays = document.getElementById(name).value;
+        var employeeType = document.getElementById(typeName).value;
+        if (employeeType == "Hourly" && (vacationDays > 10 || vacationDays < 0)) {
+            alert("Vacation days out of range");
+        } else if (employeeType == "Salaried" && (vacationDays > 15 || vacationDays < 0)) {
+            alert("Vacation days out of range");
+        }
+        else if (employeeType == "Salaried" && (vacationDays > 30 || vacationDays < 0)) {
+            alert("Vacation days out of range");
+        }
+        else {
+            $.ajax({
+
+                url: "Home/TakeVacation",
+                // data: JSON.stringify(obj),
+                data: { "employeeId": id, "workDays": vacationDays },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function () {
+                    location.reload();
+                }
+            });
+        }
+
+}
+</script>
+</body>
+</html>
